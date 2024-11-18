@@ -1,2 +1,2 @@
-# TSExcelExporter
+# TS Excel Exporter
 TSExcelExporter
