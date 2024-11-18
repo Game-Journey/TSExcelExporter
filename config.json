@@ -1,0 +1,14 @@
+
+{
+    "defaultSheetName":"MainSheet",
+
+    "excelRelativePath":"../test/excel/",
+    "logRelativePath":"../log",
+    "fontRelativePath":"../test/font/",
+
+    "exportRelativePath":"../test/json/",
+    "exportClassRelativePath":"../test/ts/",
+    "exportFontRelativePath":"../test/mini-font/",
+
+    "excludeExcelFiles":[]
+}
