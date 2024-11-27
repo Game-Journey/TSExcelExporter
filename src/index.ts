@@ -2,6 +2,7 @@ import { Config } from "./config/Config";
 import { parseConfig } from "./config/ConfigParser";
 import { excelToJson } from "./exporter/JsonExporter";
 import { exportTsClass } from "./exporter/TsClassExporter";
+import { exportTsConfigEnum } from "./exporter/TsConfigEnumExporter";
 import { Logger } from "./logger/Logger";
 import { ExcelStruct, parseExcelStruct } from "./parser/ExcelParser";
 import { getXLSXFiles } from "./utils/FileUtils";
@@ -34,6 +35,7 @@ fs.mkdirSync(exportJsonPath);
 if (fs.existsSync(exportClassPath)) {
     fs.rmdirSync(exportClassPath, { recursive: true })
 };
+fs.mkdirSync(exportClassPath);
 
 function exportJsonAndTs(excelIndex : number) {
 
@@ -89,3 +91,5 @@ const errorData = Logger.errorLogDataList;
 if (errorData.length > 0 || Logger.isBreak) {
     console.error("error: 导出失败, 请查看日志");
 }
+
+exportTsConfigEnum(excelPathArray, Config.EXPORT_CLASS_PATH + "ExcelName.ts");

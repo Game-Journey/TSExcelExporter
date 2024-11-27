@@ -2,6 +2,7 @@ import { Logger } from "../logger/Logger";
 import { ExcelStruct } from "../parser/ExcelParser";
 import { DataType } from "../parser/ParserEnum";
 import fs from "fs";
+import { pathToNormal, toUpperCamelCase } from "../utils/StringUtils";
 
 /**
  * 导出.d.ts文件, 用于编写TypeScript的智能提示
@@ -24,7 +25,11 @@ export function exportTsClass(excelStruct: ExcelStruct, outPath: string) {
     }
 
     const content = generateTsClass(excelStruct);
-    fs.writeFileSync(outPath, content);
+    let className = excelStruct.configName;
+    className = toUpperCamelCase(className);
+    outPath = pathToNormal(outPath);
+    let newOutPath = outPath.substring(0, outPath.lastIndexOf("/")) + "/" + className + ".d.ts";
+    fs.writeFileSync(newOutPath, content);
 }
 
 /**
