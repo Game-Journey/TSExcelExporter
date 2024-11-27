@@ -104,8 +104,8 @@ export class Logger {
         const logData = Logger._logDataList[Logger._logDataList.length - 1];
 
         logStr += `message: ${logData.message}\n`;
-        if (logData.args) {
-            logStr += `args: ${logData.args}\n\n`;                
+        if (logData.args && logData.args.length > 0) {
+            logStr += `args: ${logData.args}\n`;                
         }
 
         this._logFile.write(logStr);
