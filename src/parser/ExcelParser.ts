@@ -73,6 +73,7 @@ export async function parseExcelStruct(path: string): Promise<ExcelStruct | null
 
     if (worksheet == null) {
         // 没找到MainSheet表, 则使用第一个表
+        Logger.log(`没有找到MainSheet表, 使用第一个表: `+ firstSheet?.name);
         worksheet = firstSheet;
     }
 
@@ -140,9 +141,23 @@ export async function parseExcelStruct(path: string): Promise<ExcelStruct | null
     const mainColumn = worksheet.getColumn(mainKeyColumn);
     if (mainColumn == null) {
         Logger.error(`解析Excel结构失败, 没有主键列.....`);
+        Logger.break();
         return null;   
     }
     excelStruct.rowCount = getRowCount(mainColumn);
+
+    // 检测是否有重复字段名
+    let fieldNameMap = new Map<string, number>();
+    for (let i = 0; i < excelStruct.columnDataList.length; i++) {
+        let fieldName = excelStruct.columnDataList[i].fieldName;
+        if (fieldNameMap.has(fieldName)) {
+            Logger.error(`解析Excel结构失败, 字段名重复: ${fieldName}`);
+            Logger.break();
+            return null;
+        }
+        fieldNameMap.set(fieldName, 1);
+    }
+
     return excelStruct;
 }
 
@@ -168,7 +183,8 @@ function setScope(scope: string, columnData: ColumnData) {
         columnData.columnType = ColumnType.Normal;
     }
     else {
-        Logger.error(`parseExcelStruct error, scope error: ${scope}`);
+        Logger.error(`parseExcelStruct error, key设置或作用域设置错误 error: ${scope}`);
+        Logger.break();
     }
 }
 
