@@ -142,7 +142,8 @@ export function cellToInt(cell: Cell): number {
             }
         }
         else {
-            Logger.error(`公式运算失败: ${cell.formula}`);
+            Logger.error(`公式解析失败, 找不到公式结果, 请尝试重新新建Excel, 如果还是失败, 请将公式替换为直接的数值: ${cell.formula}`);
+            Logger.break();
             return 0;
             //throw new Error(`cell formula error: ${cell.formula}`);
         }

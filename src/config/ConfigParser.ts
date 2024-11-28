@@ -5,7 +5,14 @@ import { Config } from "./Config";
 
 export function parseConfig(rootPath: string) {
 
-    const configStr: string = fs.readFileSync(path.join(rootPath, "../config.json"), "utf-8");
+    let configStr: string = "";
+    if (fs.existsSync(path.join(rootPath, "./config.json"))) {
+        configStr = fs.readFileSync(path.join(rootPath, "./config.json"), "utf-8");
+    }
+    else {
+        configStr = fs.readFileSync(path.join(rootPath, "../config.json"), "utf-8");
+    }
+
     const configJson = JSON.parse(configStr);
     Config.DEFAULT_SHEET_NAME = configJson["defaultSheetName"];
     
