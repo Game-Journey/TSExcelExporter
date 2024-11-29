@@ -42,11 +42,13 @@ function generateTsClass(excelStruct: ExcelStruct): string {
     // 类名
     let className = excelStruct.configName;
     // 去除 空格,-,_字符, 并且这些字符后的字母大写
-    className = className.replace(/[\s\-_](\w)/g, (all, letter) => letter.toUpperCase());
+    className = toUpperCamelCase(className);
     className = className.substring(0, 1).toUpperCase() + className.substring(1);
 
     let typeName = className + "Config";
     className += "Class";
+
+    content += `import { IExcelConfig } from "./IExcelConfig";\n\n`;
 
     if (excelStruct.subKeyColumn === -1) {
         content += `export type ${typeName} = { [key: string]: ${className} };\n\n`;
@@ -56,7 +58,7 @@ function generateTsClass(excelStruct: ExcelStruct): string {
         content += `export type ${typeName} = { [key: string]: { [key: string]: ${className} } };\n\n`;
     }
 
-    content += `export class ${className} 
+    content += `export class ${className} implements IExcelConfig
 {\n`;
 
     // 字段
