@@ -85,10 +85,13 @@ function getTsType(dataType: DataType): string {
         case DataType.Bool:
             return "boolean";
         case DataType.Vector2:
+        case DataType.Vector2Int:
             return "{ x: number, y: number }";
         case DataType.Vector3:
+        case DataType.Vector3Int:
             return "{ x: number, y: number, z: number }";
         case DataType.Vector4:
+        case DataType.Vector4Int:
             return "{ x: number, y: number, z: number, w: number }";
         case DataType.ArrayInt:
             return "number[]";
@@ -99,10 +102,13 @@ function getTsType(dataType: DataType): string {
         case DataType.ArrayBool:
             return "boolean[]";
         case DataType.ArrayVector2:
+        case DataType.ArrayVector2Int:
             return "{ x: number, y: number }[]";
         case DataType.ArrayVector3:
+        case DataType.ArrayVector3Int:
             return "{ x: number, y: number, z: number }[]";
         case DataType.ArrayVector4:
+        case DataType.ArrayVector4Int:
             return "{ x: number, y: number, z: number, w: number }[]";
         default:
             return "any";
