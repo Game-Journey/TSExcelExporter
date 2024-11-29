@@ -115,5 +115,6 @@ try {
     Logger.log(`导出ExcelName.ts成功: ${Config.EXPORT_CLASS_PATH}ExcelName.ts`);
 
 } catch (error) {
-    Logger.error("导出失败, 程序出现错误, 请查看日志.....");
+    Logger.error("导出失败, 程序出现错误, 请查看日志.....", error);
+    throw error;
 }
