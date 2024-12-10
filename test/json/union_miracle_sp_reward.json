@@ -1,0 +1,154 @@
+{
+    "1": {
+        "1": {
+            "id": 1,
+            "sp_num": 1,
+            "chaos_value": 220,
+            "reward": []
+        },
+        "2": {
+            "id": 1,
+            "sp_num": 2,
+            "chaos_value": 180,
+            "reward": []
+        },
+        "3": {
+            "id": 1,
+            "sp_num": 3,
+            "chaos_value": 140,
+            "reward": []
+        },
+        "4": {
+            "id": 1,
+            "sp_num": 4,
+            "chaos_value": 120,
+            "reward": []
+        },
+        "5": {
+            "id": 1,
+            "sp_num": 5,
+            "chaos_value": 100,
+            "reward": []
+        },
+        "6": {
+            "id": 1,
+            "sp_num": 6,
+            "chaos_value": 80,
+            "reward": []
+        }
+    },
+    "2": {
+        "1": {
+            "id": 2,
+            "sp_num": 1,
+            "chaos_value": 80,
+            "reward": []
+        },
+        "2": {
+            "id": 2,
+            "sp_num": 2,
+            "chaos_value": 100,
+            "reward": []
+        },
+        "3": {
+            "id": 2,
+            "sp_num": 3,
+            "chaos_value": 120,
+            "reward": []
+        },
+        "4": {
+            "id": 2,
+            "sp_num": 4,
+            "chaos_value": 140,
+            "reward": []
+        },
+        "5": {
+            "id": 2,
+            "sp_num": 5,
+            "chaos_value": 180,
+            "reward": []
+        },
+        "6": {
+            "id": 2,
+            "sp_num": 6,
+            "chaos_value": 220,
+            "reward": []
+        }
+    },
+    "3": {
+        "1": {
+            "id": 3,
+            "sp_num": 1,
+            "chaos_value": 80,
+            "reward": []
+        },
+        "2": {
+            "id": 3,
+            "sp_num": 2,
+            "chaos_value": 100,
+            "reward": []
+        },
+        "3": {
+            "id": 3,
+            "sp_num": 3,
+            "chaos_value": 120,
+            "reward": []
+        },
+        "4": {
+            "id": 3,
+            "sp_num": 4,
+            "chaos_value": 140,
+            "reward": []
+        },
+        "5": {
+            "id": 3,
+            "sp_num": 5,
+            "chaos_value": 180,
+            "reward": []
+        },
+        "6": {
+            "id": 3,
+            "sp_num": 6,
+            "chaos_value": 220,
+            "reward": []
+        }
+    },
+    "4": {
+        "1": {
+            "id": 4,
+            "sp_num": 1,
+            "chaos_value": 80,
+            "reward": []
+        },
+        "2": {
+            "id": 4,
+            "sp_num": 2,
+            "chaos_value": 100,
+            "reward": []
+        },
+        "3": {
+            "id": 4,
+            "sp_num": 3,
+            "chaos_value": 120,
+            "reward": []
+        },
+        "4": {
+            "id": 4,
+            "sp_num": 4,
+            "chaos_value": 140,
+            "reward": []
+        },
+        "5": {
+            "id": 4,
+            "sp_num": 5,
+            "chaos_value": 180,
+            "reward": []
+        },
+        "6": {
+            "id": 4,
+            "sp_num": 6,
+            "chaos_value": 220,
+            "reward": []
+        }
+    }
+}

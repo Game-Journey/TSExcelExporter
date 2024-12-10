@@ -1,0 +1,22 @@
+{
+    "1": {
+        "id": 1,
+        "cost": {
+            "x": 1,
+            "y": 11,
+            "z": 1000
+        },
+        "return_value": 100,
+        "daily_count": 5
+    },
+    "2": {
+        "id": 2,
+        "cost": {
+            "x": 1,
+            "y": 2,
+            "z": 10
+        },
+        "return_value": 100,
+        "daily_count": 5
+    }
+}
