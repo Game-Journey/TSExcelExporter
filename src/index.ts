@@ -89,7 +89,7 @@ try {
             excelToJson(value, Config.EXPORT_JSON_PATH + value.configName + ".json");
             if (Logger.isBreak) {
                 Logger.error("发生阻断性错误, 导出终止....");
-                return;
+                throw new Error("发生阻断性错误, 导出终止....");
             }
             Logger.log(`导出json成功: ${path}`);
             // 导出.d.ts
@@ -109,6 +109,7 @@ try {
     const errorData = Logger.errorLogDataList;
     if (errorData.length > 0 || Logger.isBreak) {
         console.error("error: 导出失败, 请查看日志");
+        throw new Error("导出配表失败, 请查看日志");
     }
 
     exportTsConfigEnum(excelPathArray, Config.EXPORT_CLASS_PATH + "ExcelName.ts");

@@ -95,6 +95,10 @@ export class Logger {
     private static _errorLogFile: fs.WriteStream | null = null;
 
     public static saveLogToFile() {
+        if (fs.existsSync(Config.LOG_PATH) == false) {
+            fs.mkdirSync(Config.LOG_PATH);  // 创建文件夹
+        }
+        
         const logPath = path.join(Config.LOG_PATH, "log.log");
         if (this._logFile == null) {
             this._logFile = fs.createWriteStream(logPath, { flags: "w" });
@@ -108,12 +112,20 @@ export class Logger {
             logStr += `args: ${logData.args}\n`;                
         }
 
-        this._logFile.write(logStr);
+        //this._logFile.write(logStr);
+        fs.writeFileSync(logPath, logStr, { encoding: "utf-8", flag: "a" });
     }
         
 
     public static saveErrorLogToFile() {
+        if (fs.existsSync(Config.LOG_PATH) == false) {
+            fs.mkdirSync(Config.LOG_PATH);  // 创建文件夹
+        }
+
         const errorPath = path.join(Config.LOG_PATH, "error.log");
+        if(fs.existsSync(errorPath) == false) {
+            fs.writeFileSync(errorPath, "", { encoding: "utf-8" });
+        }
         if (this._errorLogFile == null) {
             this._errorLogFile = fs.createWriteStream(errorPath, { flags: "w" });
         }
@@ -125,8 +137,9 @@ export class Logger {
         errorLogStr += `args: ${logData.args}\n`;
         errorLogStr += `stack: ${logData.stack}\n\n`;
         errorLogStr += "\n";
-    
-        this._errorLogFile.write(errorLogStr);
+        
+        fs.writeFileSync(errorPath, errorLogStr, { encoding: "utf-8", flag: "a" });
+        //this._errorLogFile.write(errorLogStr);
     }
 
     public static clear() {
