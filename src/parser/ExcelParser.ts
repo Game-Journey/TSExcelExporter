@@ -183,7 +183,7 @@ function setScope(scope: string, columnData: ColumnData) {
         columnData.columnType = ColumnType.Normal;
     }
     else {
-        Logger.error(`parseExcelStruct error, key设置或作用域设置错误 error: ${scope}`);
+        Logger.error(`parseExcelStruct error, key设置或作用域设置错误 error: ${scope}`, columnData.fieldName);
         Logger.break();
     }
 }

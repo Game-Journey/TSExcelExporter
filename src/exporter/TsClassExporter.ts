@@ -112,6 +112,8 @@ function getTsType(dataType: DataType): string {
         case DataType.ArrayVector4:
         case DataType.ArrayVector4Int:
             return "{ x: number, y: number, z: number, w: number }[]";
+        case DataType.Json:
+            return "{ [key: string]: unknown }";
         default:
             return "any";
     }

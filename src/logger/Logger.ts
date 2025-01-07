@@ -100,9 +100,9 @@ export class Logger {
         }
         
         const logPath = path.join(Config.LOG_PATH, "log.log");
-        if (this._logFile == null) {
-            this._logFile = fs.createWriteStream(logPath, { flags: "w" });
-        }
+        // if (this._logFile == null) {
+        //     this._logFile = fs.createWriteStream(logPath, { flags: "w" });
+        // }
 
         let logStr = "";
         const logData = Logger._logDataList[Logger._logDataList.length - 1];
@@ -126,9 +126,9 @@ export class Logger {
         if(fs.existsSync(errorPath) == false) {
             fs.writeFileSync(errorPath, "", { encoding: "utf-8" });
         }
-        if (this._errorLogFile == null) {
-            this._errorLogFile = fs.createWriteStream(errorPath, { flags: "w" });
-        }
+        // if (this._errorLogFile == null) {
+        //     this._errorLogFile = fs.createWriteStream(errorPath, { flags: "w" });
+        // }
         let errorLogStr = "";
 
         const logData = Logger._errorLogDataList[Logger._errorLogDataList.length - 1];
