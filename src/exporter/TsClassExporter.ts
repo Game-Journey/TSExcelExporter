@@ -1,8 +1,16 @@
 import { Logger } from "../logger/Logger";
-import { ExcelStruct } from "../parser/ExcelParser";
+import { ColumnData, ExcelStruct } from "../parser/ExcelParser";
 import { DataType } from "../parser/ParserEnum";
 import fs from "fs";
 import { pathToNormal, toUpperCamelCase } from "../utils/StringUtils";
+
+const HEAD_ROW_COUNT = 5;     // 表头行数
+
+class JsonKeyValue {
+    key: string = "";
+    valueType : string = "";
+    children: Map<string, JsonKeyValue> = new Map();
+}
 
 /**
  * 导出.d.ts文件, 用于编写TypeScript的智能提示
@@ -50,6 +58,19 @@ function generateTsClass(excelStruct: ExcelStruct): string {
 
     content += `import { IExcelConfig } from "./IExcelConfig";\n\n`;
 
+    const jsonStructMap: Map<string, { content: string, interfaceName: string }> = new Map();
+    for (let i = 0, len = excelStruct.columnDataList.length; i < len; i++) {
+        const columnData = excelStruct.columnDataList[i];
+        if (columnData.dataType == DataType.Json) {
+            const jsonStruct = getJsonTypeStruct(excelStruct, columnData);
+            jsonStructMap.set(columnData.fieldName, jsonStruct);
+        }
+    }
+
+    jsonStructMap.forEach((jsonStruct, key) => {
+        content += jsonStruct.content + "\n";
+    });
+
     if (excelStruct.subKeyColumn === -1) {
         content += `export type ${typeName} = { [key: string]: ${className} };\n\n`;
     }
@@ -65,7 +86,7 @@ function generateTsClass(excelStruct: ExcelStruct): string {
     for (let i = 0, len = excelStruct.columnDataList.length; i < len; i++) {
         const columnData = excelStruct.columnDataList[i];
         content += `    /** ${columnData.commentName} */\n`;
-        content += `    ${columnData.fieldName}: ${getTsType(columnData.dataType)};\n\n`;
+        content += `    ${columnData.fieldName}: ${getTsType(excelStruct, columnData, jsonStructMap.get(columnData.fieldName))};\n\n`;
     }
 
     content += `}\n`;
@@ -73,11 +94,139 @@ function generateTsClass(excelStruct: ExcelStruct): string {
     return content;
 }
 
+function getJsonTypeStruct(excelStruct: ExcelStruct, columnData: ColumnData): {
+    content: string,
+    interfaceName: string
+} {
+    const jsonStruct: Map<string, JsonKeyValue> = new Map();
+
+    Logger.currentColumnName = columnData.fieldName;
+    const rowCount = excelStruct.rowCount;
+    const worksheet = excelStruct.sheet!;
+    for (let i = HEAD_ROW_COUNT + 1, len = rowCount; i <= len; i++) {
+        Logger.currentRow = i;
+        const row = worksheet.getRow(i);
+        try {
+            const json = JSON.parse(row.getCell(columnData.column).text);
+            if (json == null) {
+                Logger.error(`解析Json错误, row: ${i}, column: ${columnData.column}`);
+                continue;
+            }
+
+            const getJsonValueType = function(value : unknown) : string {
+                if (typeof value === "string") {
+                    return "string";
+                }
+                else if (typeof value === "number") {
+                    return "number";
+                }
+                else if (typeof value === "boolean") {
+                    return "boolean";
+                }
+                else if (Array.isArray(value)) {
+                    const arrayType = value.length > 0 ? getJsonValueType(value[0]) : "";
+                    return arrayType + "[]";
+                }
+                else if (typeof value === "object") {
+                    return "object";
+                }
+                return "unknown";
+            }
+
+            const parseJson = (table: { [key: string]: unknown }, parent: JsonKeyValue | null = null) => {
+                for (const key in table) {
+                    const value = table[key];
+                    if (typeof value === "object" && !Array.isArray(value)) {
+                        const jsonKeyValue = new JsonKeyValue();
+                        jsonKeyValue.key = key;
+                        jsonKeyValue.children = new Map();
+                        jsonKeyValue.valueType = getJsonValueType(value);
+                        if (parent) {
+                            if (parent.children.has(key)) {
+                                const valueType = parent.children.get(key)!.valueType;
+                                if (valueType == "unknown" || valueType == "[]" || valueType == "object") {
+                                    parent.children.set(key, jsonKeyValue);
+                                }
+                            }
+                            else {
+                                parent.children.set(key, jsonKeyValue);
+                            }
+                        }
+                        else {
+                            if (jsonStruct.has(key)) {
+                                const valueType = jsonStruct.get(key)!.valueType;
+                                if (valueType == "unknown" || valueType == "[]" || valueType == "object") {
+                                    jsonStruct.set(key, jsonKeyValue);
+                                }
+                            }
+                            else {
+                                jsonStruct.set(key, jsonKeyValue);
+                            }  
+                        }
+                        parseJson(value as { [key: string]: unknown }, jsonKeyValue);
+                    }
+                    else {
+                        if (parent) {
+                            parent.children.set(key, { key: key, valueType: getJsonValueType(value), children: new Map() });
+                        }
+                        else {
+                            jsonStruct.set(key, { key: key, valueType: getJsonValueType(value), children: new Map() });
+                        }
+                    }
+                }
+            }
+
+            parseJson(json);
+        }
+        catch (error) {
+            Logger.error(`解析Json错误, row: ${i}, column: ${columnData.column}`);
+        }
+    }
+
+    // 生成接口类型 export interface 接口名 {  }
+    // 接口名 = 配表名 + 字段名
+    const interfaceName = toUpperCamelCase(excelStruct.configName) + toUpperCamelCase(columnData.fieldName);
+    let content = `export interface ${interfaceName}` + " {\n";
+
+    // 递归生成接口类型
+    const generateInterface = (jsonStruct: Map<string, JsonKeyValue>, tabCount: number) => {
+        for (const [key, value] of jsonStruct) {
+            let tab = "";
+            for (let i = 0; i < tabCount; i++) {
+                tab += "    ";
+            }
+            let isJsonTable = false;
+            if (value.valueType == "object") {
+                content += `${tab}${key}: {\n`;
+                isJsonTable = true;
+            }
+            else {
+                content += `${tab}${key}: ${value.valueType};\n`;
+            }
+            generateInterface(value.children, tabCount + 1);
+            if (isJsonTable) {
+                content += `${tab}};\n`;
+            }
+        }
+    }
+
+    generateInterface(jsonStruct, 1);
+    content += "}\n";
+
+    return {
+        content: content,
+        interfaceName: interfaceName
+    };
+}
+
 /**
  * 获取TypeScript类型
- * @param dataType 数据类型
  */
-function getTsType(dataType: DataType): string {
+function getTsType(excelStruct: ExcelStruct, columnData: ColumnData, jsonStruct: {
+    content: string,
+    interfaceName: string
+} | undefined): string {
+    const dataType = columnData.dataType;
     switch (dataType) {
         case DataType.Int:
         case DataType.Float:
@@ -113,6 +262,9 @@ function getTsType(dataType: DataType): string {
         case DataType.ArrayVector4Int:
             return "{ x: number, y: number, z: number, w: number }[]";
         case DataType.Json:
+            if (jsonStruct) {
+                return jsonStruct.interfaceName;
+            }
             return "{ [key: string]: unknown }";
         default:
             return "any";
