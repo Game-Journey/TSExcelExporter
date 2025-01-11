@@ -107,7 +107,12 @@ function getJsonTypeStruct(excelStruct: ExcelStruct, columnData: ColumnData): {
         Logger.currentRow = i;
         const row = worksheet.getRow(i);
         try {
-            const json = JSON.parse(row.getCell(columnData.column).text);
+            let text = row.getCell(columnData.column).text;
+            if (text == null || text.trim() == "") {
+                text = "{}";
+            }
+
+            const json = JSON.parse(text);
             if (json == null) {
                 Logger.error(`解析Json错误, row: ${i}, column: ${columnData.column}`);
                 continue;
