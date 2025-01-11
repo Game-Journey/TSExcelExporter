@@ -185,6 +185,7 @@ function getJsonTypeStruct(excelStruct: ExcelStruct, columnData: ColumnData): {
         }
         catch (error) {
             Logger.error(`解析Json错误, row: ${i}, column: ${columnData.column}`);
+            Logger.break();
         }
     }
 
@@ -206,11 +207,11 @@ function getJsonTypeStruct(excelStruct: ExcelStruct, columnData: ColumnData): {
                 isJsonTable = true;
             }
             else {
-                content += `${tab}${key}: ${value.valueType};\n`;
+                content += `${tab}${key}: ${value.valueType} | undefined;\n`;
             }
             generateInterface(value.children, tabCount + 1);
             if (isJsonTable) {
-                content += `${tab}};\n`;
+                content += `${tab}} | undefined;\n`;
             }
         }
     }
