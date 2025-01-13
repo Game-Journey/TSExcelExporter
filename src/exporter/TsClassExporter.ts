@@ -142,9 +142,14 @@ function getJsonTypeStruct(excelStruct: ExcelStruct, columnData: ColumnData): {
                 for (const key in table) {
                     const value = table[key];
                     if (typeof value === "object" && !Array.isArray(value)) {
-                        const jsonKeyValue = new JsonKeyValue();
+                        let jsonKeyValue = new JsonKeyValue();
+                        if (parent) {
+                            jsonKeyValue = parent.children.get(key) || new JsonKeyValue();
+                        }
+                        else {
+                            jsonKeyValue = jsonStruct.get(key) || new JsonKeyValue();
+                        }
                         jsonKeyValue.key = key;
-                        jsonKeyValue.children = new Map();
                         jsonKeyValue.valueType = getJsonValueType(value);
                         if (parent) {
                             if (parent.children.has(key)) {
