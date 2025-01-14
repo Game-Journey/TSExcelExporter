@@ -55,12 +55,12 @@ try {
 
         if (Logger.errorLogDataList.length > 100) {
             Logger.error("错误日志过多, 导出终止, 请查看日志文件, 修复错误后再次导出");
-            return
+            throw new Error("错误日志过多, 导出终止, 请查看日志文件, 修复错误后再次导出");
         }
 
         if (Logger.isBreak) {
             Logger.error("发生阻断性错误, 导出终止....");
-            return;
+            throw new Error("发生阻断性错误, 导出终止....");
         }
 
         const path = pathToNormal(excelPathArray[excelIndex]);
@@ -72,15 +72,12 @@ try {
         parseExcelStruct(path).then((value: ExcelStruct | null) => {
             if (!value) {
                 Logger.error("解析Excel结构失败....导出终止....")
-                // if (excelIndex < excelPathArray.length - 1) {
-                //     exportJsonAndTs(excelIndex + 1);
-                // }
-                return;
+                throw new Error("解析Excel结构失败....导出终止....");
             }
 
             if (value.rowCount == null || value.rowCount <= HEAD_ROW_COUNT) {
                 Logger.error(configName + ": Excel行数错误...., rowCount: " + value.rowCount);
-                return;
+                throw new Error(configName + ": Excel行数错误...., rowCount: " + value.rowCount);
             }
 
             Logger.log(`解析Excel结构成功: ${path}`);
