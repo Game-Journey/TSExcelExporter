@@ -3,7 +3,7 @@ import { DataType } from "./ParserEnum";
 import { cellToFloat, cellToInt, stringToFloat, stringToInt, stringToVector2, stringToVector2Int, stringToVector3, stringToVector3Int, stringToVector4, stringToVector4Int } from "../utils/Utils";
 import { Logger } from "../logger/Logger";
 
-type ParseFunction = (cell: Cell) => object | number | string | boolean;
+type ParseFunction = (cell: Cell) => object | number | string | boolean | undefined;
 
 const DataParseFunc: Map<DataType, ParseFunction> = new Map<DataType, ParseFunction>();
 
@@ -117,7 +117,10 @@ DataParseFunc.set(DataType.ArrayVector2, (cell: Cell) => {
     if (cell.text) {
         const segments = cell.text.split("|");  // 竖线分隔
         for(let i = 0; i < segments.length; i++) {
-            result.push(stringToVector2(segments[i]));
+            const value = stringToVector2(segments[i]);
+            if (value) {
+                result.push(value);
+            }
         }
     }
     else {
@@ -131,7 +134,10 @@ DataParseFunc.set(DataType.ArrayVector2Int, (cell: Cell) => {
     if (cell.text) {
         const segments = cell.text.split("|");  // 竖线分隔
         for(let i = 0; i < segments.length; i++) {
-            result.push(stringToVector2Int(segments[i]));
+            const value = stringToVector2Int(segments[i]);
+            if (value) {
+                result.push(value);
+            }
         }
     }
     else {
@@ -145,7 +151,10 @@ DataParseFunc.set(DataType.ArrayVector3, (cell: Cell) => {
     if (cell.text) {
         const segments = cell.text.split("|");  // 竖线分隔
         for(let i = 0; i < segments.length; i++) {
-            result.push(stringToVector3(segments[i]));
+            const value = stringToVector3(segments[i]);
+            if (value) {
+                result.push(value);
+            }
         }
     }
     else {
@@ -159,7 +168,10 @@ DataParseFunc.set(DataType.ArrayVector3Int, (cell: Cell) => {
     if (cell.text) {
         const segments = cell.text.split("|");  // 竖线分隔
         for(let i = 0; i < segments.length; i++) {
-            result.push(stringToVector3Int(segments[i]));
+            const value = stringToVector3Int(segments[i]);
+            if (value) {
+                result.push(value);
+            }
         }
     }
     else {
@@ -173,7 +185,10 @@ DataParseFunc.set(DataType.ArrayVector4, (cell: Cell) => {
     if (cell.text) {
         const segments = cell.text.split("|");  // 竖线分隔
         for(let i = 0; i < segments.length; i++) {
-            result.push(stringToVector4(segments[i]));
+            const value = stringToVector4(segments[i]);
+            if (value) {
+                result.push(value);
+            }
         }
     }
     else {
@@ -187,7 +202,10 @@ DataParseFunc.set(DataType.ArrayVector4Int, (cell: Cell) => {
     if (cell.text) {
         const segments = cell.text.split("|");  // 竖线分隔
         for(let i = 0; i < segments.length; i++) {
-            result.push(stringToVector4Int(segments[i]));
+            const value = stringToVector4Int(segments[i]);
+            if (value) {
+                result.push(value);
+            }
         }
     }
     else {
@@ -198,7 +216,7 @@ DataParseFunc.set(DataType.ArrayVector4Int, (cell: Cell) => {
 
 // ------------------------------ 其他
 DataParseFunc.set(DataType.Any, (cell: Cell) => {
-    return cell.text || "";
+    return cell.text;
 });
 
 DataParseFunc.set(DataType.Json, (cell: Cell) => {

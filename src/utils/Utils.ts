@@ -38,60 +38,64 @@ export function stringToFloat(value: string): number {
     }
 }
 
-export function stringToVector2(value: string): { x: number, y: number } {
+export function stringToVector2(value: string): { x: number, y: number } | undefined {
     const result = { x: 0, y: 0 };
-    if (value) {
+    if (value && value.length > 0) {
         const segments = value.split(/[,;]/);  // 逗号或分号分隔
         if (segments.length === 2) {
             result.x = stringToFloat(segments[0]);
             result.y = stringToFloat(segments[1]);
         }
+        return result;
     }
-    return result;
+    return undefined;
 }
 
-export function stringToVector2Int(value: string): { x: number, y: number } {
+export function stringToVector2Int(value: string): { x: number, y: number } | undefined {
     const result = { x: 0, y: 0 };
-    if (value) {
+    if (value && value.length > 0) {
         const segments = value.split(/[,;]/);  // 逗号或分号分隔
         if (segments.length === 2) {
             result.x = stringToInt(segments[0]);
             result.y = stringToInt(segments[1]);
         }
+        return result;
     }
-    return result;
+    return undefined;
 }
 
 
-export function stringToVector3(value: string): { x: number, y: number, z: number } {
+export function stringToVector3(value: string): { x: number, y: number, z: number } | undefined {
     const result = { x: 0, y: 0, z: 0 };
-    if (value) {
+    if (value && value.length > 0) {
         const segments = value.split(/[,;]/);  // 逗号或分号分隔
         if (segments.length === 3) {
             result.x = stringToFloat(segments[0]);
             result.y = stringToFloat(segments[1]);
             result.z = stringToFloat(segments[2]);
         }
+        return result;
     }
-    return result;
+    return undefined;
 }
 
-export function stringToVector3Int(value: string): { x: number, y: number, z: number } {
+export function stringToVector3Int(value: string): { x: number, y: number, z: number } | undefined {
     const result = { x: 0, y: 0, z: 0 };
-    if (value) {
+    if (value && value.length > 0) {
         const segments = value.split(/[,;]/);  // 逗号或分号分隔
         if (segments.length === 3) {
             result.x = stringToInt(segments[0]);
             result.y = stringToInt(segments[1]);
             result.z = stringToInt(segments[2]);
         }
+        return result;
     }
-    return result;
+    return undefined;
 }
 
-export function stringToVector4(value: string): { x: number, y: number, z: number, w: number } {
+export function stringToVector4(value: string): { x: number, y: number, z: number, w: number } | undefined {
     const result = { x: 0, y: 0, z: 0, w: 0 };
-    if (value) {
+    if (value && value.length > 0) {
         const segments = value.split(/[,;]/);  // 逗号或分号分隔
         if (segments.length === 4) {
             result.x = stringToFloat(segments[0]);
@@ -99,13 +103,14 @@ export function stringToVector4(value: string): { x: number, y: number, z: numbe
             result.z = stringToFloat(segments[2]);
             result.w = stringToFloat(segments[3]);
         }
+        return result;
     }
-    return result;
+    return undefined;
 }
 
-export function stringToVector4Int(value: string): { x: number, y: number, z: number, w: number } {
+export function stringToVector4Int(value: string): { x: number, y: number, z: number, w: number } | undefined {
     const result = { x: 0, y: 0, z: 0, w: 0 };
-    if (value) {
+    if (value && value.length > 0) {
         const segments = value.split(/[,;]/);  // 逗号或分号分隔
         if (segments.length === 4) {
             result.x = stringToInt(segments[0]);
@@ -113,11 +118,12 @@ export function stringToVector4Int(value: string): { x: number, y: number, z: nu
             result.z = stringToInt(segments[2]);
             result.w = stringToInt(segments[3]);
         }
+        return result;
     }
-    return result;
+    return undefined;
 }
 
-export function cellToInt(cell: Cell): number {
+export function cellToInt(cell: Cell): number | undefined {
     if (cell == null) {
         return 0;
     }
@@ -126,6 +132,9 @@ export function cellToInt(cell: Cell): number {
         const result = cell.result;
         if (result != null) {
             if (typeof result === "string") {
+                if (result.trim() === "") {
+                    return undefined;
+                }
                 return stringToInt(result);
             }
             else if (typeof result === "number") {
@@ -144,17 +153,20 @@ export function cellToInt(cell: Cell): number {
         else {
             Logger.error(`公式解析失败, 找不到公式结果, 请尝试重新新建Excel, 如果还是失败, 请将公式替换为直接的数值: ${cell.formula}`);
             Logger.break();
-            return 0;
+            return undefined;
             //throw new Error(`cell formula error: ${cell.formula}`);
         }
     }
     else {
         const textValue = cell.text;
+        if (textValue.trim() === "") {
+            return undefined;
+        }
         return stringToInt(textValue);
     }
 }
 
-export function cellToFloat(cell: Cell): number {
+export function cellToFloat(cell: Cell): number | undefined {
     if (cell == null) {
         return 0;
     }
@@ -163,6 +175,9 @@ export function cellToFloat(cell: Cell): number {
         const result = cell.result;
         if (result != null) {
             if (typeof result === "string") {
+                if (result.trim() === "") {
+                    return undefined;
+                }
                 return stringToFloat(result);
             }
             else if (typeof result === "number") {
@@ -180,6 +195,9 @@ export function cellToFloat(cell: Cell): number {
     }
     else {
         const textValue = cell.text;
+        if (textValue.trim() === "") {
+            return undefined;
+        }
         return stringToFloat(textValue);
     }
 }

@@ -122,10 +122,9 @@ function exportRow(row: Row, excelStruct: ExcelStruct): { [key: string]: any } |
             }
     
             let result = parseFunc(cell);
-            if (result == null) {
-                result = "_error_";
+            if (result !== undefined) {
+                rowData[columnData.fieldName] = result;
             }
-            rowData[columnData.fieldName] = result;
         } catch (error) {
             Logger.error(`exportRow error, column: ${columnData.column}, error: ${error}`);
             Logger.break();
