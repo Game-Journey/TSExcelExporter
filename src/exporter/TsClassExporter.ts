@@ -198,7 +198,7 @@ function getJsonTypeStruct(excelStruct: ExcelStruct, columnData: ColumnData): {
     // 接口名 = 配表名 + 字段名
     const interfaceName = toUpperCamelCase(excelStruct.configName) + toUpperCamelCase(columnData.fieldName);
     let content = `export interface ${interfaceName}` + " {\n";
-    content +=  "    " +"[key: string]: unknown | undefined;\n";
+    content +=  "    " +"[key: string]: any | undefined;\n";
     // 递归生成接口类型
     const generateInterface = (jsonStruct: Map<string, JsonKeyValue>, tabCount: number) => {
         for (const [key, value] of jsonStruct) {
@@ -209,7 +209,7 @@ function getJsonTypeStruct(excelStruct: ExcelStruct, columnData: ColumnData): {
             let isJsonTable = false;
             if (value.valueType == "object") {
                 content += `${tab}${key}: {\n`;
-                content += tab + "    " + "[key: string]: unknown | undefined;\n";
+                content += tab + "    " + "[key: string]: any | undefined;\n";
                 isJsonTable = true;
             }
             else {
@@ -277,7 +277,7 @@ function getTsType(excelStruct: ExcelStruct, columnData: ColumnData, jsonStruct:
             if (jsonStruct) {
                 return jsonStruct.interfaceName;
             }
-            return "{ [key: string]: unknown }";
+            return "{ [key: string]: any }";
         default:
             return "any";
     }

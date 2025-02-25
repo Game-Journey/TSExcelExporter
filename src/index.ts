@@ -76,7 +76,7 @@ try {
             }
 
             if (value.rowCount == null || value.rowCount <= HEAD_ROW_COUNT) {
-                Logger.error(configName + ": Excel行数错误...., rowCount: " + value.rowCount);
+                Logger.error(configName + ": Excel行数错误, 必须大于5行, rowCount: " + value.rowCount);
                 throw new Error(configName + ": Excel行数错误...., rowCount: " + value.rowCount);
             }
 

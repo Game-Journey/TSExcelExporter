@@ -69,7 +69,7 @@ export function excelToJson(excelStruct: ExcelStruct, outPath: string) {
 
                 let subKey = row.getCell(subKeyIndex).text;
                 if (subKey == null || subKey.trim() == "") {
-                    Logger.error(`excelToJson error, 子Key为空, row: ${i}`);
+                    Logger.error(`excelToJson error, 子Key为空, row: ${i}, subKey: ${subKey}`);
                     Logger.break();
                     continue;
                 }
@@ -78,7 +78,7 @@ export function excelToJson(excelStruct: ExcelStruct, outPath: string) {
                     jsonData[mainKey][subKey] = exportRow(row, excelStruct);
                 }
                 else {
-                    Logger.error(`excelToJson error, 子Key重复, row: ${i}`);
+                    Logger.error(`excelToJson error, 子Key重复, row: ${i}, subKey: ${subKey}`);
                     Logger.break();
                 }
 
