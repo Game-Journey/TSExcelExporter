@@ -86,7 +86,7 @@ function generateTsClass(excelStruct: ExcelStruct): string {
     for (let i = 0, len = excelStruct.columnDataList.length; i < len; i++) {
         const columnData = excelStruct.columnDataList[i];
         content += `    /** ${columnData.commentName} */\n`;
-        content += `    ${columnData.fieldName}: ${getTsType(excelStruct, columnData, jsonStructMap.get(columnData.fieldName))};\n\n`;
+        content += `    readonly ${columnData.fieldName}: ${getTsType(excelStruct, columnData, jsonStructMap.get(columnData.fieldName))};\n\n`;
     }
 
     content += `}\n`;
@@ -198,7 +198,7 @@ function getJsonTypeStruct(excelStruct: ExcelStruct, columnData: ColumnData): {
     // 接口名 = 配表名 + 字段名
     const interfaceName = toUpperCamelCase(excelStruct.configName) + toUpperCamelCase(columnData.fieldName);
     let content = `export interface ${interfaceName}` + " {\n";
-    content +=  "    " +"[key: string]: any | undefined;\n";
+    content +=  "    " +"readonly [key: string]: any | undefined;\n";
     // 递归生成接口类型
     const generateInterface = (jsonStruct: Map<string, JsonKeyValue>, tabCount: number) => {
         for (const [key, value] of jsonStruct) {
@@ -209,11 +209,11 @@ function getJsonTypeStruct(excelStruct: ExcelStruct, columnData: ColumnData): {
             let isJsonTable = false;
             if (value.valueType == "object") {
                 content += `${tab}${key}: {\n`;
-                content += tab + "    " + "[key: string]: any | undefined;\n";
+                content += tab + "    " + "readonly [key: string]: any | undefined;\n";
                 isJsonTable = true;
             }
             else {
-                content += `${tab}${key}: ${value.valueType} | undefined;\n`;
+                content += `${tab}readonly ${key}: ${value.valueType} | undefined;\n`;
             }
             generateInterface(value.children, tabCount + 1);
             if (isJsonTable) {
@@ -249,35 +249,35 @@ function getTsType(excelStruct: ExcelStruct, columnData: ColumnData, jsonStruct:
             return "boolean";
         case DataType.Vector2:
         case DataType.Vector2Int:
-            return "{ x: number, y: number }";
+            return "readonly { readonly x: number, readonly y: number }";
         case DataType.Vector3:
         case DataType.Vector3Int:
-            return "{ x: number, y: number, z: number }";
+            return "readonly { readonly x: number, readonly y: number, readonly z: number }";
         case DataType.Vector4:
         case DataType.Vector4Int:
-            return "{ x: number, y: number, z: number, w: number }";
+            return "readonly { readonly x: number, readonly y: number, readonly z: number, readonly w: number }";
         case DataType.ArrayInt:
-            return "number[]";
+            return "readonly number[]";
         case DataType.ArrayFloat:
-            return "number[]";
+            return "readonly number[]";
         case DataType.ArrayString:
-            return "string[]";
+            return "readonly string[]";
         case DataType.ArrayBool:
-            return "boolean[]";
+            return "readonly boolean[]";
         case DataType.ArrayVector2:
         case DataType.ArrayVector2Int:
-            return "{ x: number, y: number }[]";
+            return "readonly { readonly x: number, readonly y: number }[]";
         case DataType.ArrayVector3:
         case DataType.ArrayVector3Int:
-            return "{ x: number, y: number, z: number }[]";
+            return "readonly { readonly x: number, readonly y: number, readonly z: number }[]";
         case DataType.ArrayVector4:
         case DataType.ArrayVector4Int:
-            return "{ x: number, y: number, z: number, w: number }[]";
+            return "readonly { readonly x: number, readonly y: number, readonly z: number, readonly w: number }[]";
         case DataType.Json:
             if (jsonStruct) {
                 return jsonStruct.interfaceName;
             }
-            return "{ [key: string]: any }";
+            return "readonly { [key: string]: any }";
         default:
             return "any";
     }
