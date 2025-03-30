@@ -25,4 +25,5 @@ export function parseConfig(rootPath: string) {
     Config.EXPORT_FONT_PATH = path.join(rootPath, configJson["exportFontRelativePath"]);
 
     Config.EXCLUDE_EXCEL_FILES = configJson["excludeExcelFiles"];
+    Config.ENCRYPT_MODE = configJson["encryptMode"];
 }

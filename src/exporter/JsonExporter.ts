@@ -3,10 +3,12 @@ import { Logger } from "../logger/Logger";
 import { ExcelStruct } from "../parser/ExcelParser";
 import DataParseFunc from "../parser/DataParseFunc";
 import fs from "fs";
+import { EncryptEnum } from "../encrypt/EncryptEnum";
+import { xorDeobfuscateStringUtf8, xorEncryptData, xorObfuscateStringUtf8 } from "../encrypt/XOREncrypt";
 
 const HEAD_ROW_COUNT = 5;     // 表头行数
 
-export function excelToJson(excelStruct: ExcelStruct, outPath: string) {
+export function excelToJson(excelStruct: ExcelStruct, outPath: string, encrypt = EncryptEnum.None) {
 
     if (excelStruct == null) {
         Logger.error(`excelToJson error, excelStruct is null`);
@@ -95,7 +97,21 @@ export function excelToJson(excelStruct: ExcelStruct, outPath: string) {
         }
     }
 
-    fs.writeFileSync(outPath, JSON.stringify(jsonData, null, 4));
+    let jsonStr = ""; 
+
+    if (encrypt == EncryptEnum.XOR) {
+        //jsonData.__encrypt__ = 1;
+        jsonStr = JSON.stringify(jsonData, null, 4);
+        const encryptCode = Math.floor(Math.random() * 255);
+        xorEncryptData.excels[excelStruct.configName] = encryptCode;
+        jsonStr = xorObfuscateStringUtf8(jsonStr, encryptCode);
+        //jsonStr = xorDeobfuscateStringUtf8(jsonStr);
+    }
+    else if (encrypt == EncryptEnum.None) {
+        jsonStr = JSON.stringify(jsonData, null, 4);
+    }
+
+    fs.writeFileSync(outPath, jsonStr);
 }
 
 

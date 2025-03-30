@@ -10,5 +10,6 @@
     "exportClassRelativePath":"../test/ts/",
     "exportFontRelativePath":"../test/mini-font/",
 
-    "excludeExcelFiles":[]
+    "excludeExcelFiles":[],
+    "encryptMode":1
 }
