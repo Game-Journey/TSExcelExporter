@@ -11,5 +11,6 @@
     "exportFontRelativePath":"../test/mini-font/",
 
     "excludeExcelFiles":[],
+    "encryptFiles":[],
     "encryptMode":1
 }

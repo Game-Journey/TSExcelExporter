@@ -5,6 +5,7 @@ import DataParseFunc from "../parser/DataParseFunc";
 import fs from "fs";
 import { EncryptEnum } from "../encrypt/EncryptEnum";
 import { xorDeobfuscateStringUtf8, xorEncryptData, xorObfuscateStringUtf8 } from "../encrypt/XOREncrypt";
+import { Config } from "../config/Config";
 
 const HEAD_ROW_COUNT = 5;     // 表头行数
 
@@ -99,7 +100,7 @@ export function excelToJson(excelStruct: ExcelStruct, outPath: string, encrypt =
 
     let jsonStr = ""; 
 
-    if (encrypt == EncryptEnum.XOR) {
+    if (Config.ENCRYPT_FILES.includes(excelStruct.configName) && encrypt == EncryptEnum.XOR) {
         //jsonData.__encrypt__ = 1;
         jsonStr = JSON.stringify(jsonData, null, 4);
         const encryptCode = Math.floor(Math.random() * 255);
@@ -107,7 +108,7 @@ export function excelToJson(excelStruct: ExcelStruct, outPath: string, encrypt =
         jsonStr = xorObfuscateStringUtf8(jsonStr, encryptCode);
         //jsonStr = xorDeobfuscateStringUtf8(jsonStr);
     }
-    else if (encrypt == EncryptEnum.None) {
+    else {
         jsonStr = JSON.stringify(jsonData, null, 4);
     }
 
