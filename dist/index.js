@@ -13,6 +13,8 @@ const ExcelParser_1 = require("./parser/ExcelParser");
 const FileUtils_1 = require("./utils/FileUtils");
 const fs_1 = __importDefault(require("fs"));
 const StringUtils_1 = require("./utils/StringUtils");
+const EncryptEnum_1 = require("./encrypt/EncryptEnum");
+const XOREncrypt_1 = require("./encrypt/XOREncrypt");
 const dirname = __dirname;
 const HEAD_ROW_COUNT = 5; // 表头行数
 // 读取配置文件
@@ -50,11 +52,11 @@ try {
     function exportJsonAndTs(excelIndex) {
         if (Logger_1.Logger.errorLogDataList.length > 100) {
             Logger_1.Logger.error("错误日志过多, 导出终止, 请查看日志文件, 修复错误后再次导出");
-            return;
+            throw new Error("错误日志过多, 导出终止, 请查看日志文件, 修复错误后再次导出");
         }
         if (Logger_1.Logger.isBreak) {
             Logger_1.Logger.error("发生阻断性错误, 导出终止....");
-            return;
+            throw new Error("发生阻断性错误, 导出终止....");
         }
         const path = (0, StringUtils_1.pathToNormal)(excelPathArray[excelIndex]);
         const configName = path.substring(path.lastIndexOf("/") + 1, path.lastIndexOf("."));
@@ -64,18 +66,15 @@ try {
         (0, ExcelParser_1.parseExcelStruct)(path).then((value) => {
             if (!value) {
                 Logger_1.Logger.error("解析Excel结构失败....导出终止....");
-                // if (excelIndex < excelPathArray.length - 1) {
-                //     exportJsonAndTs(excelIndex + 1);
-                // }
-                return;
+                throw new Error("解析Excel结构失败....导出终止....");
             }
             if (value.rowCount == null || value.rowCount <= HEAD_ROW_COUNT) {
-                Logger_1.Logger.error(configName + ": Excel行数错误...., rowCount: " + value.rowCount);
-                return;
+                Logger_1.Logger.error(configName + ": Excel行数错误, 必须大于5行, rowCount: " + value.rowCount);
+                throw new Error(configName + ": Excel行数错误...., rowCount: " + value.rowCount);
             }
             Logger_1.Logger.log(`解析Excel结构成功: ${path}`);
             // 导出json
-            (0, JsonExporter_1.excelToJson)(value, Config_1.Config.EXPORT_JSON_PATH + value.configName + ".json");
+            (0, JsonExporter_1.excelToJson)(value, Config_1.Config.EXPORT_JSON_PATH + value.configName + ".json", Config_1.Config.ENCRYPT_MODE);
             if (Logger_1.Logger.isBreak) {
                 Logger_1.Logger.error("发生阻断性错误, 导出终止....");
                 throw new Error("发生阻断性错误, 导出终止....");
@@ -86,6 +85,22 @@ try {
             Logger_1.Logger.log(`导出.d.ts文件成功: ${path} \n`);
             if (excelIndex < excelPathArray.length - 1) {
                 exportJsonAndTs(excelIndex + 1);
+            }
+            else {
+                // 导出完成了
+                // 导出加密信息的json文件
+                const encryptJsonPath = Config_1.Config.EXPORT_JSON_PATH + "encrypt.json";
+                if (Config_1.Config.ENCRYPT_MODE == EncryptEnum_1.EncryptEnum.XOR) {
+                    let encryptJson = JSON.stringify(XOREncrypt_1.xorEncryptData, null, 4);
+                    // base64加密
+                    encryptJson = Buffer.from(encryptJson).toString("base64");
+                    fs_1.default.writeFileSync(encryptJsonPath, encryptJson);
+                    Logger_1.Logger.log(`导出加密信息成功: ${encryptJsonPath}`);
+                }
+                else if (Config_1.Config.ENCRYPT_MODE == EncryptEnum_1.EncryptEnum.None) {
+                    // 无加密
+                    fs_1.default.writeFileSync(encryptJsonPath, "{}");
+                }
             }
         });
     }

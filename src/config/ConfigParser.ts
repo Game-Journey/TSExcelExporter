@@ -21,6 +21,7 @@ export function parseConfig(rootPath: string) {
     Config.FONT_PATH = path.join(rootPath, configJson["fontRelativePath"]);
 
     Config.EXPORT_JSON_PATH = path.join(rootPath, configJson["exportRelativePath"]);
+    Config.EXPORT_ENCRYPT_JSON_PATH = path.join(rootPath, configJson["exportEncryptRelativePath"]);
     Config.EXPORT_CLASS_PATH = path.join(rootPath, configJson["exportClassRelativePath"]);
     Config.EXPORT_FONT_PATH = path.join(rootPath, configJson["exportFontRelativePath"]);
 

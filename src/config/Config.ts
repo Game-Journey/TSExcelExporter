@@ -7,6 +7,7 @@ export class Config {
     static FONT_PATH: string = "../../font/";        // 字体文件相对路径
 
     static EXPORT_JSON_PATH: string = "../../save/";      // 保存json文件相对路径
+    static EXPORT_ENCRYPT_JSON_PATH: string = "../../save/encrypt/"; // 保存加密json文件相对路径
     static EXPORT_CLASS_PATH: string = "../../src/config/";      // 保存.d.ts文件相对路径
     static EXPORT_FONT_PATH: string = "../../save/font/";        // 保存字体文件相对路径
 

@@ -102,7 +102,7 @@ try {
             else {
                 // 导出完成了
                 // 导出加密信息的json文件
-                const encryptJsonPath = Config.EXPORT_JSON_PATH + "encrypt.json";
+                const encryptJsonPath = Config.EXPORT_ENCRYPT_JSON_PATH + "encrypt.json";
                 if (Config.ENCRYPT_MODE == EncryptEnum.XOR) {
                     let encryptJson = JSON.stringify(xorEncryptData, null, 4);
                     // base64加密
