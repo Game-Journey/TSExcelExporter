@@ -114,6 +114,9 @@ try {
                     // 无加密
                     fs.writeFileSync(encryptJsonPath, "{}"); 
                 }
+
+                // 配表检测
+                Logger.log("所有Excel文件导出成功, 开始进行配表检测....");
             }
         });
     }

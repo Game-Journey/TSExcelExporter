@@ -18,6 +18,8 @@ export class ColumnData {
     public columnType: ColumnType = ColumnType.Normal;
     // 数据类型
     public dataType: DataType = DataType.String;
+    // 数据检测
+    public dataCheck: string = "";
 }
 
 export class ExcelStruct {
