@@ -13,6 +13,8 @@ export class Config {
 
     static EXCLUDE_EXCEL_FILES: string[] = [""]; // 排除的Excel文件
 
+    static CLASS_TYPE: string = "cs"; // 导出类的类型, ts或cs
+
     static ENCRYPT_FILES: string[] = []; // 需要加密的Excel文件
     static ENCRYPT_MODE: number = 1; // 加密模式,对应EncryptEnum
 }

@@ -25,6 +25,8 @@ export function parseConfig(rootPath: string) {
     Config.EXPORT_CLASS_PATH = path.join(rootPath, configJson["exportClassRelativePath"]);
     Config.EXPORT_FONT_PATH = path.join(rootPath, configJson["exportFontRelativePath"]);
 
+    Config.CLASS_TYPE = configJson["classType"] || "cs"; // 默认导出类型为ts
+    
     Config.EXCLUDE_EXCEL_FILES = configJson["excludeExcelFiles"];
 
     Config.ENCRYPT_FILES = configJson["encryptFiles"];
