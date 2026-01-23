@@ -100,7 +100,7 @@ function generateCsClass(excelStruct: ExcelStruct): string {
     for (let i = 0, len = excelStruct.columnDataList.length; i < len; i++) {
         const columnData = excelStruct.columnDataList[i];
         content += `        /** ${columnData.commentName} */\n`;
-        content += `        [JsonProperty("${columnData.fieldName}")] // Json序列化字段名\n`;
+        content += `        [JsonProperty("${columnData.fieldName}")]\n`;
         content += `        public ${getCsType(excelStruct, columnData, jsonStructMap.get(columnData.fieldName))} ${columnData.fieldName} { get; private set; }\n\n`;
     }
 
@@ -164,7 +164,7 @@ function getJsonTypeStruct(excelStruct: ExcelStruct, columnData: ColumnData): {
                     return "string";
                 }
                 else if (typeof value === "number") {
-                    return "long"; 
+                    return "float"; 
                 }
                 else if (typeof value === "boolean") {
                     return "bool";
@@ -249,12 +249,12 @@ function getJsonTypeStruct(excelStruct: ExcelStruct, columnData: ColumnData): {
             }
             let isJsonTable = false;
             if (value.valueType == "object") {
-                content += `${tab}[JsonProperty("${value.key}")] // Json序列化字段名\n`;
+                content += `${tab}[JsonProperty("${value.key}")]\n`;
                 content += `public ${tab}object ${key} {get; private set; }\n`;    // json类型只导出一层结构
                 isJsonTable = true;
             }
             else {
-                content += `${tab}[JsonProperty("${value.key}")] // Json序列化字段名\n`;
+                content += `${tab}[JsonProperty("${value.key}")]\n`;
                 content += `${tab}public ${value.valueType} ${key} {get; private set; }\n`;
             }
 
