@@ -8,6 +8,7 @@ import { Logger } from "./logger/Logger";
 import { ExcelStruct, parseExcelStruct } from "./parser/ExcelParser";
 import { checkDuplicateFileName, filterFiles, getXLSXFiles } from "./utils/FileUtils";
 import fs from "fs";
+import path from "path";
 import { pathToNormal } from "./utils/StringUtils";
 import { EncryptEnum } from "./encrypt/EncryptEnum";
 import { xorEncryptData } from "./encrypt/XOREncrypt";
@@ -42,6 +43,7 @@ Logger.clear();
 // 删除导出目录下的所有文件
 const exportJsonPath = Config.EXPORT_JSON_PATH;
 const exportClassPath = Config.EXPORT_CLASS_PATH;
+const filesToKeep = ["README.md", "ExcelInterfaces.cs"]
 
 try {
     if (fs.existsSync(exportJsonPath)) {
@@ -49,10 +51,23 @@ try {
     };
     fs.mkdirSync(exportJsonPath);
 
+    // if (fs.existsSync(exportClassPath)) {
+    //     fs.rmdirSync(exportClassPath, { recursive: true })
+    // };
+    // fs.mkdirSync(exportClassPath);
     if (fs.existsSync(exportClassPath)) {
-        fs.rmdirSync(exportClassPath, { recursive: true })
-    };
-    fs.mkdirSync(exportClassPath);
+        const files = fs.readdirSync(exportClassPath);
+
+        files.forEach(file => {
+            // 如果当前文件不在保留列表中
+            if (!filesToKeep.includes(file)) {
+                const curPath = path.join(exportClassPath, file);
+                fs.rmSync(curPath, { recursive: true, force: true });
+            }
+        });
+    } else {
+        fs.mkdirSync(exportClassPath);
+    }
     Logger.log(`清空导出目录成功: ${exportJsonPath}, ${exportClassPath}\n`);
 
     function exportJsonAndTs(excelIndex: number) {

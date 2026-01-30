@@ -235,12 +235,13 @@ function getJsonTypeStruct(excelStruct: ExcelStruct, columnData: ColumnData): {
         }
     }
 
-    // 生成接口类型 export interface 接口名 {  }
+    // 生成类
     // 接口名 = 配表名 + 字段名
     const interfaceName = toUpperCamelCase(excelStruct.configName) + toUpperCamelCase(columnData.fieldName);
+
     let content = "    [Serializable]\n";
-    content += `    public class ${interfaceName}` + " {\n";
-    // 递归生成接口类型
+    content += `    public partial class ${interfaceName}` + " {\n";
+    // 递归生成类
     const generateInterface = (jsonStruct: Map<string, JsonKeyValue>, tabCount: number) => {
         for (const [key, value] of jsonStruct) {
             let tab = "    ";
