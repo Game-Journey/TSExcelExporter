@@ -43,7 +43,7 @@ Logger.clear();
 // 删除导出目录下的所有文件
 const exportJsonPath = Config.EXPORT_JSON_PATH;
 const exportClassPath = Config.EXPORT_CLASS_PATH;
-const filesToKeep = ["README.md", "ExcelInterfaces.cs"]
+const filesToKeep = ["README.md", "ExcelInterfaces.cs", "FreeParticleExcelClass.asmdef"]
 
 try {
     if (fs.existsSync(exportJsonPath)) {

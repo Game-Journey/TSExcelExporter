@@ -3,6 +3,7 @@ import { ColumnData, ExcelStruct } from "../parser/ExcelParser";
 import { DataType } from "../parser/ParserEnum";
 import fs from "fs";
 import { pathToNormal, toUpperCamelCase } from "../utils/StringUtils";
+import { ParseJsonFunc } from "../parser/JsonParser";
 
 const HEAD_ROW_COUNT = 5;     // 表头行数
 
@@ -153,7 +154,7 @@ function getJsonTypeStruct(excelStruct: ExcelStruct, columnData: ColumnData): {
                 text = "{}";
             }
 
-            const json = JSON.parse(text);
+            const json = ParseJsonFunc(text);
             if (json == null) {
                 Logger.error(`解析Json错误, row: ${i}, column: ${columnData.column}`);
                 continue;
