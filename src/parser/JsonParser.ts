@@ -14,6 +14,11 @@ export function ParseJsonFunc(text: string): { [key: string]: unknown }
         return `__STR_${strings.length - 1}__`;
     });
 
+    // 去除单行注释 // ... (直到行尾)
+    protectedText = protectedText.replace(/\/\/.*$/gm, ""); 
+    // 去除多行注释 /* ... */
+    protectedText = protectedText.replace(/\/\*[\s\S]*?\*\//g, "");
+
     // 2. 【安全清洗】现在剩下的都是结构符号，可以大胆替换了
     protectedText = protectedText.replace(/[\r\n\t]+/g, ""); // 去掉换行和制表符
     protectedText = protectedText.replace(/：/g, ":");       // 中文冒号 -> 英文
