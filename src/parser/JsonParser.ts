@@ -28,6 +28,16 @@ export function ParseJsonFunc(text: string): { [key: string]: unknown }
     // 去掉对象/数组末尾多余的逗号 (例如 {a:1,} -> {a:1})
     protectedText = protectedText.replace(/,(\s*[}\]])/g, '$1'); 
 
+    // 补全大括号
+    protectedText = protectedText.trim();
+    // 只有当它不以 { 开头，也不以 [ 开头时，才补全
+    if (!protectedText.startsWith("{") && !protectedText.startsWith("[")) {
+        protectedText = "{" + protectedText;
+        if (!protectedText.endsWith("}")) {
+            protectedText = protectedText + "}";
+        }
+    }
+
     // 3. 【还原】把保护起来的字符串放回去
     let finalText = protectedText.replace(/__STR_(\d+)__/g, (match, index) => {
         return strings[index];
@@ -41,7 +51,7 @@ export function ParseJsonFunc(text: string): { [key: string]: unknown }
         let result =new Function("return " + finalText)();
         return result;
     } catch (error) {
-        Logger.error(`Json parse error: ${finalText}`);
+        Logger.error(`Json parse error: ${finalText} ${error}`);
         return {};
     }
 }

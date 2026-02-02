@@ -140,18 +140,21 @@ function getJsonTypeStruct(excelStruct: ExcelStruct, columnData: ColumnData): {
     content: string,
     interfaceName: string
 } {
-    const jsonStruct: Map<string, JsonKeyValue> = new Map();
+    // 定义节点结构
+    const rootChildren: Map<string, JsonKeyValue> = new Map();
 
     Logger.currentColumnName = columnData.fieldName;
     const rowCount = excelStruct.rowCount;
     const worksheet = excelStruct.sheet!;
+
+    // 1. 遍历所有行，收集 JSON 结构
     for (let i = HEAD_ROW_COUNT + 1, len = rowCount; i <= len; i++) {
         Logger.currentRow = i;
         const row = worksheet.getRow(i);
         try {
             let text = row.getCell(columnData.column).text;
             if (text == null || text.trim() == "") {
-                text = "{}";
+                text = "{}"; // 空单元格视为默认对象
             }
 
             const json = ParseJsonFunc(text);
@@ -160,121 +163,139 @@ function getJsonTypeStruct(excelStruct: ExcelStruct, columnData: ColumnData): {
                 continue;
             }
 
-            const getJsonValueType = function(value : unknown) : string {
-                if (typeof value === "string") {
-                    return "string";
+            // 获取值的类型字符串
+            const getJsonValueType = function (value: unknown): string {
+                if (typeof value === "string") return "string";
+                if (typeof value === "number") return "float"; // 默认用float，兼容性好
+                if (typeof value === "boolean") return "bool";
+                if (Array.isArray(value)) {
+                    // 如果是数组，递归检查第一个元素来确定类型，并标记为数组
+                    const innerType = value.length > 0 ? getJsonValueType(value[0]) : "object"; 
+                    return innerType + "[]";
                 }
-                else if (typeof value === "number") {
-                    return "float"; 
-                }
-                else if (typeof value === "boolean") {
-                    return "bool";
-                }
-                else if (Array.isArray(value)) {
-                    const arrayType = value.length > 0 ? getJsonValueType(value[0]) : "";
-                    return arrayType + "[]";
-                }
-                else if (typeof value === "object") {
-                    return "object";
-                }
+                if (typeof value === "object") return "object";
                 return "object";
-            }
+            };
 
-            const parseJson = (table: { [key: string]: unknown }, parent: JsonKeyValue | null = null) => {
-                for (const key in table) {
-                    const value = table[key];
-                    if (typeof value === "object" && !Array.isArray(value)) {
-                        let jsonKeyValue = new JsonKeyValue();
-                        if (parent) {
-                            jsonKeyValue = parent.children.get(key) || new JsonKeyValue();
-                        }
-                        else {
-                            jsonKeyValue = jsonStruct.get(key) || new JsonKeyValue();
-                        }
-                        jsonKeyValue.key = key;
-                        jsonKeyValue.valueType = getJsonValueType(value);
-                        if (parent) {
-                            if (parent.children.has(key)) {
-                                const valueType = parent.children.get(key)!.valueType;
-                                if ( valueType == "[]" || valueType == "object") {
-                                    parent.children.set(key, jsonKeyValue);
-                                }
-                            }
-                            else {
-                                parent.children.set(key, jsonKeyValue);
-                            }
-                        }
-                        else {
-                            if (jsonStruct.has(key)) {
-                                const valueType = jsonStruct.get(key)!.valueType;
-                                if (valueType == "[]" || valueType == "object") {
-                                    jsonStruct.set(key, jsonKeyValue);
-                                }
-                            }
-                            else {
-                                jsonStruct.set(key, jsonKeyValue);
-                            }  
-                        }
-                        parseJson(value as { [key: string]: unknown }, jsonKeyValue);
+            // 递归解析并合并结构
+            // currentMap: 当前层级的字段Map
+            // jsonObj: 当前层级的Json对象
+            const parseJsonRecursive = (currentMap: Map<string, JsonKeyValue>, jsonObj: any) => {
+                if (jsonObj == null || typeof jsonObj !== "object") return;
+
+                // 如果是数组，我们需要去解析数组里的第一个元素（假设数组内结构一致）
+                if (Array.isArray(jsonObj)) {
+                    if (jsonObj.length > 0 && typeof jsonObj[0] === "object") {
+                        // 注意：这里我们不直接遍历数组，而是依赖父级调用时传入正确的目标对象
+                        // 但在当前的逻辑流中，parseJsonRecursive 主要处理 Object 的 key。
+                        // 数组的处理逻辑在调用侧（下方循环中）处理比较合适。
+                        parseJsonRecursive(currentMap, jsonObj[0]);
                     }
-                    else {
-                        if (parent) {
-                            parent.children.set(key, { key: key, valueType: getJsonValueType(value), children: new Map() });
+                    return;
+                }
+
+                for (const key in jsonObj) {
+                    const value = jsonObj[key];
+                    let type = getJsonValueType(value);
+                    
+                    // 获取或创建当前key的节点
+                    let node = currentMap.get(key);
+                    if (!node) {
+                        node = new JsonKeyValue();
+                        node.key = key;
+                        node.valueType = type;
+                        currentMap.set(key, node);
+                    }
+
+                    // 检查是否是嵌套对象或对象数组，需要递归向下合并结构
+                    if (type === "object") {
+                        parseJsonRecursive(node.children, value);
+                    } else if (type === "object[]" || (type.endsWith("[]") && typeof value[0] === "object")) {
+                        // 如果是对象数组，修改类型标记为 "object[]"，并解析数组项
+                        node.valueType = "object[]"; 
+                        if (Array.isArray(value) && value.length > 0) {
+                            parseJsonRecursive(node.children, value[0]);
                         }
-                        else {
-                            jsonStruct.set(key, { key: key, valueType: getJsonValueType(value), children: new Map() });
-                        }
+                    } else {
+                        // 基本类型，更新类型（防止之前是null或者类型变更为更通用的类型，这里简单处理）
+                        node.valueType = type;
                     }
                 }
-            }
+            };
 
-            parseJson(json);
+            parseJsonRecursive(rootChildren, json);
         }
         catch (error) {
-            Logger.error(`解析Json错误, row: ${i}, column: ${columnData.column}`);
-            Logger.break();
+            Logger.error(`解析Json错误, row: ${i}, column: ${columnData.column}, error: ${error}`);
         }
     }
 
-    // 生成类
-    // 接口名 = 配表名 + 字段名
-    const interfaceName = toUpperCamelCase(excelStruct.configName) + toUpperCamelCase(columnData.fieldName);
+   // 2. 生成 C# 类代码
+    const rootInterfaceName = toUpperCamelCase(excelStruct.configName) + toUpperCamelCase(columnData.fieldName);
+    let classDefinitions = "";
 
-    let content = "    [Serializable]\n";
-    content += `    public partial class ${interfaceName}` + " {\n";
-    // 递归生成类
-    const generateInterface = (jsonStruct: Map<string, JsonKeyValue>, tabCount: number) => {
-        for (const [key, value] of jsonStruct) {
-            let tab = "    ";
-            for (let i = 0; i < tabCount; i++) {
-                tab += "    ";
-            }
-            let isJsonTable = false;
-            if (value.valueType == "object") {
-                content += `${tab}[JsonProperty("${value.key}")]\n`;
-                content += `public ${tab}object ${key} {get; private set; }\n`;    // json类型只导出一层结构
-                isJsonTable = true;
-            }
-            else {
-                content += `${tab}[JsonProperty("${value.key}")]\n`;
-                content += `${tab}public ${value.valueType} ${key} {get; private set; }\n`;
+    // 递归生成类函数
+    // className: 当前要生成的类名
+    // children: 该类的字段结构
+    // indent: 缩进空格数
+    const generateClassRecursive = (className: string, children: Map<string, JsonKeyValue>, indentLevel: number): string => {
+        const indent = "    ".repeat(indentLevel);
+        let sb = "";
+        
+        sb += `${indent}[Serializable]\n`;
+        sb += `${indent}public partial class ${className} {\n`;
+
+        // 收集需要生成的子类
+        const subClassesToGenerate: { name: string, children: Map<string, JsonKeyValue> }[] = [];
+
+        for (const [key, node] of children) {
+            const propertyName = key; // 保持JSON中的原始字段名
+            const fieldName = toUpperCamelCase(key); // C# 属性名通常大写开头，这里如果为了匹配JSON简单起见，也可以直接用 key
+            
+            let cSharpType = node.valueType;
+            let isNested = false;
+
+            // 处理嵌套对象
+            if (node.valueType === "object") {
+                const subClassName = toUpperCamelCase(key); // 使用Key作为类名
+                cSharpType = subClassName;
+                subClassesToGenerate.push({ name: subClassName, children: node.children });
+                isNested = true;
+            } 
+            // 处理对象数组
+            else if (node.valueType === "object[]") {
+                const subClassName = toUpperCamelCase(key); // 使用Key作为类名（单数形式最好，但在自动生成中通常直接用Key）
+                // 也可以尝试去掉复数 's'，例如 items -> Item，这里暂时直接用 Key
+                cSharpType = `${subClassName}[]`; // 或者 List<SubClassName>
+                subClassesToGenerate.push({ name: subClassName, children: node.children });
+                isNested = true;
             }
 
-            if (!isJsonTable){
-                generateInterface(value.children, tabCount + 1);
-            }
-            // if (isJsonTable) {
-            //     content += `${tab}};\n`;
-            // }
+            sb += `${indent}    [JsonProperty("${propertyName}")]\n`;
+            // 注意：这里属性名用了 key，如果需要大写开头，可以改为 public ${cSharpType} ${toUpperCamelCase(key)} { get; private set; }
+            sb += `${indent}    public ${cSharpType} ${key} { get; private set; }\n\n`;
         }
-    }
 
-    generateInterface(jsonStruct, 1);
-    content += "    }\n";
+        // 在类内部（或者外部，这里选择内部以保持命名空间整洁）生成子类
+        for (const sub of subClassesToGenerate) {
+            sb += generateClassRecursive(sub.name, sub.children, indentLevel + 1);
+            sb += "\n";
+        }
+
+        sb += `${indent}}\n`;
+        return sb;
+    };
+
+    if (rootChildren.size > 0) {
+        classDefinitions = generateClassRecursive(rootInterfaceName, rootChildren, 1);
+    } else {
+        // 如果没有解析到任何字段，生成一个空类
+        classDefinitions = `    [Serializable]\n    public partial class ${rootInterfaceName} {}\n`;
+    }
 
     return {
-        content: content,
-        interfaceName: interfaceName
+        content: classDefinitions,
+        interfaceName: rootInterfaceName
     };
 }
 
