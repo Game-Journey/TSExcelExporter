@@ -38,6 +38,13 @@ export function ParseJsonFunc(text: string): { [key: string]: unknown }
         }
     }
 
+    // 遍历所有被保护的字符串，将其内部的真实换行符替换为转义后的 \n
+    for (let i = 0; i < strings.length; i++) {
+        // 这里的正则匹配真实的换行符，并将其替换为字符串 "\\n"
+        // 注意：如果是给 new Function 用，"\\n" 最终会被解析为换行
+        strings[i] = strings[i].replace(/\r?\n/g, "\\n");
+    }
+
     // 3. 【还原】把保护起来的字符串放回去
     let finalText = protectedText.replace(/__STR_(\d+)__/g, (match, index) => {
         return strings[index];
