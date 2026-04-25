@@ -166,7 +166,7 @@ function getJsonTypeStruct(excelStruct: ExcelStruct, columnData: ColumnData): {
             // 获取值的类型字符串
             const getJsonValueType = function (value: unknown): string {
                 if (typeof value === "string") return "string";
-                if (typeof value === "number") return "float"; // 默认用float，兼容性好
+                if (typeof value === "number") return "double"; // 默认用double，兼容性好
                 if (typeof value === "boolean") return "bool";
                 if (Array.isArray(value)) {
                     // 如果是数组，递归检查第一个元素来确定类型，并标记为数组

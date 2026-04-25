@@ -47,9 +47,9 @@ const filesToKeep = ["README.md", "ExcelInterfaces.cs", "FreeParticleExcelClass.
 
 try {
     if (fs.existsSync(exportJsonPath)) {
-        fs.rmdirSync(exportJsonPath, { recursive: true })
-    };
-    fs.mkdirSync(exportJsonPath);
+        fs.rmSync(exportJsonPath, { recursive: true, force: true });
+    }
+    fs.mkdirSync(exportJsonPath, { recursive: true });
 
     // if (fs.existsSync(exportClassPath)) {
     //     fs.rmdirSync(exportClassPath, { recursive: true })
